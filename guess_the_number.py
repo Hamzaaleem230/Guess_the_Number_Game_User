@@ -1,38 +1,37 @@
-import streamlit as st
+# guess_the_number.py
 import random
+import streamlit as st
+
+st.set_page_config(page_title="Guess the Number", page_icon="🎯")
 
 st.title("🎯 Guess the Number Game")
-st.write("I'm thinking of a number between 1 and 100. Can you guess it?")
 
-# Initialize session state variables
-if 'secret_number' not in st.session_state:
-    st.session_state.secret_number = random.randint(1, 100)
-if 'attempts' not in st.session_state:
+# Initialize the random number in session_state if not already done
+if 'number' not in st.session_state:
+    st.session_state.number = random.randint(1, 100)
     st.session_state.attempts = 0
-if 'game_over' not in st.session_state:
-    st.session_state.game_over = False
+    st.session_state.message = ""
 
 # Input from the user
-guess = st.number_input("Enter your guess", min_value=1, max_value=100, step=1)
+guess = st.number_input("Enter your guess (1-100):", min_value=1, max_value=100, key="guess_input")
 
-# Guess button
-if st.button("Submit Guess") and not st.session_state.game_over:
+# Submit button
+if st.button("Submit"):
     st.session_state.attempts += 1
-
-    if guess < st.session_state.secret_number:
-        st.warning("Too low! Try again.")
-    elif guess > st.session_state.secret_number:
-        st.warning("Too high! Try again.")
+    if guess < st.session_state.number:
+        st.session_state.message = "🔻 Too low! Try again."
+    elif guess > st.session_state.number:
+        st.session_state.message = "🔺 Too high! Try again."
     else:
-        st.success(f"🎉 Correct! You guessed it in {st.session_state.attempts} attempts.")
-        st.session_state.game_over = True
+        st.session_state.message = f"🎉 Congratulations! You guessed the number in {st.session_state.attempts} tries."
 
-# Restart game
-if st.button("Play Again"):
-    st.session_state.secret_number = random.randint(1, 100)
-    st.session_state.attempts = 0
-    st.session_state.game_over = False
-    st.experimental_rerun()
+# Display the message
+if st.session_state.message:
+    if "Congratulations" in st.session_state.message:
+        st.success(st.session_state.message)
+    else:
+        st.info(st.session_state.message)
 
-# Show attempts and score
-st.write(f"You have made {st.session_state.attempts} attempts.")
+# Footer
+st.markdown("---")
+st.markdown("Made with ❤️ by Hamza Syed")
